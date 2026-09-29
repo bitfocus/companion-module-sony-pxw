@@ -10,8 +10,8 @@ const AMBER = combineRgb(190, 130, 0)
 const BLUE = combineRgb(0, 70, 140)
 const GREEN = combineRgb(0, 120, 60)
 
-const btn = (category, name, text, bgcolor, actions, feedbacks = [], size = '14') => ({
-	type: 'button',
+const btn = (category, name, text, bgcolor, actions, feedbacks = [], size = 14) => ({
+	type: 'simple',
 	category,
 	name,
 	style: { text, size, color: WHITE, bgcolor },
@@ -21,10 +21,10 @@ const btn = (category, name, text, bgcolor, actions, feedbacks = [], size = '14'
 
 // Zoom runs until told to stop, so these buttons drive on press and halt on release.
 const holdBtn = (category, name, text, bgcolor, down, up) => ({
-	type: 'button',
+	type: 'simple',
 	category,
 	name,
-	style: { text, size: '14', color: WHITE, bgcolor },
+	style: { text, size: 14, color: WHITE, bgcolor },
 	steps: [{ down, up }],
 	feedbacks: [],
 })
@@ -357,7 +357,7 @@ function buildPresets(cam) {
 	)
 
 	// --- Status ---------------------------------------------------------------
-	add('status_model', btn('Status', 'Model', '$(sony-pxw:model)', BLACK, [], [], '12'))
+	add('status_model', btn('Status', 'Model', '$(sony-pxw:model)', BLACK, [], [], 12))
 	add('status_battery', btn('Status', 'Battery', 'BATT\\n$(sony-pxw:battery)', BLACK, []))
 	add('status_slot1', btn('Status', 'Slot 1', 'SLOT1\\n$(sony-pxw:slot1_time)', BLACK, []))
 	add('status_slot2', btn('Status', 'Slot 2', 'SLOT2\\n$(sony-pxw:slot2_time)', BLACK, []))
@@ -373,7 +373,20 @@ function buildPresets(cam) {
 		),
 	)
 
-	return presets
+	// API 2.x: presets carry no category; grouping is a separate section structure
+	const sections = new Map()
+	for (const [id, preset] of Object.entries(presets)) {
+		const cat = preset.category
+		delete preset.category
+		if (!sections.has(cat)) sections.set(cat, [])
+		sections.get(cat).push(id)
+	}
+	const structure = [...sections].map(([name, ids]) => ({
+		id: name.toLowerCase().replace(/[^a-z0-9]+/g, '_'),
+		name,
+		definitions: ids,
+	}))
+	return { structure, presets }
 }
 
 module.exports = { buildPresets }

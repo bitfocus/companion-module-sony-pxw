@@ -39,7 +39,7 @@ const VARS = [
 class PxwInstance extends InstanceBase {
 	async init(config) {
 		this.config = config
-		this.setVariableDefinitions(VARS.map(([variableId, name]) => ({ variableId, name })))
+		this.setVariableDefinitions(Object.fromEntries(VARS.map(([variableId, name]) => [variableId, { name }])))
 		this.updateStatus(InstanceStatus.Connecting)
 		this.connect()
 	}
@@ -61,13 +61,16 @@ class PxwInstance extends InstanceBase {
 		this.cam.on('down', (reason) => {
 			this.updateStatus(InstanceStatus.ConnectionFailure, reason)
 			this.log('warn', `camera connection lost: ${reason}`)
-			this.checkFeedbacks()
+			this.checkAllFeedbacks()
 		})
 		this.cam.on('props', () => {
 			this.updateVariables()
-			this.checkFeedbacks()
+			this.checkAllFeedbacks()
 			if (!this.presetsBuilt) {
-				this.setPresetDefinitions(buildPresets(this.cam))
+				{
+					const { structure, presets } = buildPresets(this.cam)
+					this.setPresetDefinitions(structure, presets)
+				}
 				this.presetsBuilt = true
 			}
 		})
@@ -277,9 +280,9 @@ class PxwInstance extends InstanceBase {
 				// Maps percent onto the f-stop list the camera reports. Coalesces
 				// bursts: a moving fader fires many events, but only the latest
 				// target is sent once the in-flight PTP write finishes.
-				callback: async (event, context) => {
-					const txt = await context.parseVariablesInString(String(event.options.percent))
-					const pct = Math.max(0, Math.min(100, parseFloat(txt)))
+				callback: async (event) => {
+					// API 2.x resolves variables/expressions in options before the callback
+					const pct = Math.max(0, Math.min(100, parseFloat(String(event.options.percent))))
 					if (isNaN(pct)) return
 					const p = cam().get(P.IRIS)
 					const stops = (p?.setValues || []).filter((v) => v < 4000).sort((a, b) => a - b)
