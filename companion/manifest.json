@@ -1,18 +1,18 @@
 {
 	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
 	"type": "connection",
-	"id": "your-module-name",
-	"name": "your-module-name",
-	"shortname": "module-shortname",
-	"description": "A short one line description of your module",
-	"version": "0.0.0",
+	"id": "sony-pxw",
+	"name": "sony-pxw",
+	"shortname": "PXW",
+	"description": "Sony PXW-Z300 / PXW-Z200 / HXR-NX800 camcorder control (Camera Remote Control over PTP-IP/SSH)",
+	"version": "1.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/bitfocus/companion-module-your-module-name.git",
-	"bugs": "https://github.com/bitfocus/companion-module-your-module-name/issues",
+	"repository": "git+https://github.com/bitfocus/companion-module-sony-pxw.git",
+	"bugs": "https://github.com/bitfocus/companion-module-sony-pxw/issues",
 	"maintainers": [
 		{
-			"name": "Your name",
-			"email": "Your email"
+			"name": "Phil Hadfield",
+			"email": "phil@atov.co.uk"
 		}
 	],
 	"runtime": {
@@ -22,7 +22,7 @@
 		"entrypoint": "../src/main.js"
 	},
 	"legacyIds": [],
-	"manufacturer": "Your company",
-	"products": ["Your product"],
-	"keywords": []
+	"manufacturer": "Sony",
+	"products": ["PXW-Z300", "PXW-Z200", "HXR-NX800"],
+	"keywords": ["camcorder", "PTP", "camera", "xdcam"]
 }
